@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ContractorAI Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #1a1d24;
+      --bg-card:  #21252e;
+      --border:   #2e3341;
+      --amber:    #f5a623;
+      --amber-dk: #d4881a;
+      --text:     #e8eaf0;
+      --muted:    #8b92a4;
+      --grid:     rgba(255,255,255,0.03);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-diamonds {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-diamonds span {
+      position: absolute;
+      display: block;
+      border: 1.5px solid rgba(245,166,35,0.08);
+      transform: rotate(45deg);
+    }
+    .bg-diamonds span:nth-child(1) { width: 200px; height: 200px; top: 30px; left: -60px; }
+    .bg-diamonds span:nth-child(2) { width: 260px; height: 260px; top: 120px; left: -100px; opacity: .5; }
+    .bg-diamonds span:nth-child(3) { width: 180px; height: 180px; bottom: 60px; left: 20px; }
+    .bg-diamonds span:nth-child(4) { width: 220px; height: 220px; top: 80px; right: 60px; }
+    .bg-diamonds span:nth-child(5) { width: 300px; height: 300px; top: 0px; right: 0px; opacity: .4; }
+    .bg-diamonds span:nth-child(6) { width: 120px; height: 120px; bottom: 120px; right: 160px; }
+
+    /* NAV */
+    nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(26,29,36,0.85);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: .02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-logo .logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-logo .logo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .nav-signin {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-signin:hover { color: var(--amber); }
+    .nav-signin svg { width: 14px; height: 14px; }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 100px 48px 60px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(64px, 9vw, 120px);
+      font-weight: 900;
+      line-height: .95;
+      letter-spacing: -.01em;
+      color: var(--text);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .hero-subtitle {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 48px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--amber);
+      color: #111;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 14px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background .2s, transform .15s;
+      cursor: pointer;
+      border: none;
+      letter-spacing: .02em;
+    }
+    .btn-primary:hover { background: var(--amber-dk); transform: translateY(-1px); }
+    .btn-primary svg { width: 14px; height: 14px; }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text);
+      font-weight: 500;
+      font-size: 14px;
+      padding: 13px 24px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      text-decoration: none;
+      transition: border-color .2s, color .2s;
+      cursor: pointer;
+    }
+    .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+
+    /* FEATURE CARDS */
+    .cards {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding: 0 48px 80px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 24px;
+      transition: border-color .25s, transform .2s;
+      cursor: default;
+    }
+    .card:hover { border-color: var(--amber); transform: translateY(-3px); }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      color: var(--amber);
+    }
+    .card-icon svg { width: 28px; height: 28px; }
+    .card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+    .card p  { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+
+    /* DOWNLOAD SECTION */
+    .download-section {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 48px 72px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 42px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .section-desc {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin-bottom: 36px;
+      max-width: 540px;
+      line-height: 1.6;
+    }
+
+    .download-btns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      padding: 14px 22px;
+      border-radius: 12px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color .2s, transform .15s, background .2s;
+    }
+    .btn-download:hover {
+      border-color: var(--amber);
+      background: rgba(245,166,35,0.06);
+      transform: translateY(-2px);
+    }
+
+    .dl-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .dl-icon.apk { background: rgba(61,220,132,0.12); color: #3ddc84; }
+    .dl-icon.aab { background: rgba(66,133,244,0.12); color: #4285f4; }
+    .dl-icon svg { width: 20px; height: 20px; }
+
+    .dl-meta { text-align: left; }
+    .dl-name { font-size: 13.5px; font-weight: 700; color: var(--text); display: block; }
+    .dl-sub  { font-size: 11.5px; color: var(--muted); margin-top: 2px; display: block; }
+
+    /* INSTALL GUIDE */
+    .install-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px 28px;
+    }
+
+    .install-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .install-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .install-badge.apk { background: rgba(61,220,132,0.15); color: #3ddc84; }
+    .install-badge.aab { background: rgba(66,133,244,0.15); color: #4285f4; }
+
+    .install-card-header h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .install-card-header p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .install-steps { list-style: none; }
+
+    .install-steps li {
+      display: flex;
+      gap: 14px;
+      padding: 13px 0;
+      border-bottom: 1px solid rgba(46,51,65,0.6);
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .install-steps li:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(245,166,35,0.1);
+      color: var(--amber);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .install-steps li strong { color: var(--text); font-weight: 600; }
+
+    .install-note {
+      margin-top: 18px;
+      padding: 13px 16px;
+      background: rgba(245,166,35,0.05);
+      border: 1px solid rgba(245,166,35,0.18);
+      border-radius: 9px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .install-note strong { color: var(--amber); }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      border-top: 1px solid var(--border);
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .cards { grid-template-columns: repeat(2, 1fr); }
+      nav, .hero, .cards, .download-section, footer { padding-left: 24px; padding-right: 24px; }
+      .hero { padding-top: 60px; }
+    }
+    @media (max-width: 520px) {
+      .cards { grid-template-columns: 1fr; }
+      .hero-title { font-size: 52px; }
+      .btn-download { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card, .btn-primary, .btn-ghost, .btn-download { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-diamonds" aria-hidden="true">
+    <span></span><span></span><span></span>
+    <span></span><span></span><span></span>
+  </div>
+
+  <!-- Nav -->
+  <nav>
+    <a href="#" class="nav-logo">
+      <div class="logo-icon">
+        <img src="logo.png" alt="Logo" />
+      </div>
+      ContractorAI
+    </a>
+    <a href="#" class="nav-signin">
+      Sign in
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <p class="eyebrow">Contractor Finance, Built Like a Toolbox</p>
+    <h1 class="hero-title">ContractorAI Suite</h1>
+    <p class="hero-subtitle">Contractor Finance</p>
+    <div class="hero-actions">
+      <a href="#download" class="btn-primary">
+        Get started
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+      <a href="#" class="btn-ghost">I have an account</a>
+    </div>
+  </section>
+
+  <!-- Feature Cards -->
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="2" width="14" height="20" rx="2"/>
+          <path d="M9 7h6M9 11h6M9 15h4"/>
+          <circle cx="16" cy="17" r="3"/>
+          <path d="M16 16v2M15 17h2"/>
+        </svg>
+      </div>
+      <h3>Invoices</h3>
+      <p>Draft, send, track &amp; pay — every invoice in one place.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+      </div>
+      <h3>Ledger</h3>
+      <p>Every dollar accounted for — all transactions logged.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 16V4m0 0L3 8m4-4 4 4"/>
+          <path d="M17 8v12m0 0 4-4m-4 4-4-4"/>
+        </svg>
+      </div>
+      <h3>EFTs</h3>
+      <p>Log transfers &amp; subscriptions with full audit trail.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="5" width="18" height="14" rx="2"/>
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M3 9h2M19 9h2M3 15h2M19 15h2"/>
+        </svg>
+      </div>
+      <h3>Receipts</h3>
+      <p>Photo a receipt, scan &amp; organise — zero manual entry.</p>
+    </div>
+  </div>
+
+  <!-- Download Section -->
+  <div class="download-section" id="download">
+    <p class="section-label">Get the App</p>
+    <h2 class="section-title">Download ContractorAI Suite</h2>
+    <p class="section-desc">Install directly on any Android device — no Play Store required. Just download, allow the install, and you're live.</p>
+
+    <!-- Download Button -->
+    <div class="download-btns">
+      <a href="app-release.apk" download class="btn-download">
+        <div class="dl-icon apk">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 16V4M8 12l4 4 4-4"/>
+            <path d="M4 20h16"/>
+          </svg>
+        </div>
+        <div class="dl-meta">
+          <span class="dl-name">Download ContractorAI.apk</span>
+          <span class="dl-sub">Android 8.0+ · Direct sideload · Free</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Install Guide — single full-width card -->
+    <div class="install-card" style="max-width:860px;">
+      <div class="install-card-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+            <span class="install-badge apk">APK Install Guide</span>
+            <h4>How to Install on Android</h4>
+          </div>
+          <p>Follow these steps carefully — the whole process takes under 2 minutes.</p>
+        </div>
+      </div>
+
+      <ol class="install-steps">
+        <li>
+          <span class="step-num">1</span>
+          <div>
+            <strong>Tap the download button above.</strong><br>
+            Your browser will begin downloading <code>app-release.apk</code>. If Chrome asks <em>"This type of file can harm your device"</em>, tap <strong>Download anyway</strong> — this warning appears for all APKs, not just this one.
+          </div>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <div>
+            <strong>Enable "Install unknown apps" for your browser.</strong><br>
+            Android blocks APKs from outside the Play Store by default. Go to <strong>Settings → Apps</strong>, find your browser (e.g. Chrome), tap it, then select <strong>Install unknown apps</strong> and toggle <em>Allow from this source</em> to ON. You only need to do this once.
+          </div>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <div>
+            <strong>Open the downloaded file.</strong><br>
+            Pull down your notification shade and tap the completed download — <strong>app-release.apk</strong> — or open your <strong>Files / Downloads</strong> app and locate it there. Tap the file to launch the Android installer.
+          </div>
+        </li>
+        <li>
+          <span class="step-num">4</span>
+          <div>
+            <strong>Review permissions and tap Install.</strong><br>
+            Android will show you a summary of what the app can access. Review these, then tap <strong>Install</strong>. The installation only takes a few seconds.
+          </div>
+        </li>
+        <li>
+          <span class="step-num">5</span>
+          <div>
+            <strong>Handle Play Protect warnings (if any).</strong><br>
+            If you see <em>"Play Protect blocked this app"</em>, tap <strong>More details</strong> → <strong>Install anyway</strong>. This is a standard warning for apps distributed outside the Play Store and does not mean the app is unsafe.
+          </div>
+        </li>
+        <li>
+          <span class="step-num">6</span>
+          <div>
+            <strong>Open ContractorAI Suite.</strong><br>
+            Once installed, tap <strong>Open</strong> on the installer screen, or find <strong>ContractorAI Suite</strong> in your app drawer. Sign in or create an account to get started.
+          </div>
+        </li>
+        <li>
+          <span class="step-num">7</span>
+          <div>
+            <strong>Updating the app in future.</strong><br>
+            When a new version is released, download the latest <strong>ContractorAI.apk</strong> from this page and install it — Android will automatically update over the existing installation without losing any of your data.
+          </div>
+        </li>
+      </ol>
+
+      <div class="install-note">
+        <strong>Compatible devices:</strong> Android 8.0 (Oreo) and above. Works on Samsung, Xiaomi, OnePlus, Oppo, Huawei, and all standard Android devices. Not compatible with iOS / iPhone.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <span>© ContractorAI Suite</span>
+    <span style="display:flex;align-items:center;gap:8px;">
+      <img src="Solontrich.png" alt="Solontrich" style="width:22px;height:22px;object-fit:contain;" />
+      Built by Solontrich
+    </span>
+  </footer>
+
+</body>
+</html>
